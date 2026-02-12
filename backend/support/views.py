@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from .services.chatbot_engine import ChatbotEngine
 
 from .models import PatientRequest, Volunteer, ContactMessage
 from .serializers import (
@@ -59,5 +60,19 @@ def create_contact(request):
         )
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def chatbot_response(request):
+    message = request.data.get("message", "")
+
+    if not message:
+        return Response(
+            {"error": "Message is required."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    result = ChatbotEngine.process_message(message)
+
+    return Response(result, status=status.HTTP_200_OK)
 
 # Create your views here.
