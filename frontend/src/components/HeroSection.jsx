@@ -16,7 +16,7 @@ export default function HeroSection({ onActivateChat }) {
               placeholder="Type your request..."
               onFocus={onActivateChat}
             />
-            <button onClick={onActivateChat}>Get Help</button>
+            <button onClick={() => onActivateChat()}>Get Help</button>
           </div>
         </div>
       </div>

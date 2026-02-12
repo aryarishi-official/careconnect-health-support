@@ -1,9 +1,21 @@
 import { useState } from "react";
+import { useEffect } from "react";
 
-export default function ChatWidget({ onRoute }) {
+export default function ChatWidget({ onRoute, forceOpen })  {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([
+    {
+      sender: "bot",
+      text: "Hello! How can I assist you today?"
+    }
+  ]);
+  
+  useEffect(() => {
+  if (forceOpen) {
+    setOpen(true);
+  }
+}, [forceOpen]);
 
   const handleSend = async () => {
     if (!message.trim()) return;
@@ -51,11 +63,11 @@ export default function ChatWidget({ onRoute }) {
 
                 {chat.route && (
                   <button
-                    className="route-button"
-                    onClick={() => onRoute(chat.route)}
-                  >
-                    Open Form
-                  </button>
+  className="route-button"
+  onClick={() => onRoute(chat.route)}
+>
+  {chat.route === "/patient" ? "Get Help" : "Proceed"}
+</button>
                 )}
               </div>
             ))}
