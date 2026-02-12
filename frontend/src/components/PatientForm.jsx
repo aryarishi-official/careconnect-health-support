@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function PatientForm() {
+export default function PatientForm({ onSuccess })  {
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -22,24 +22,35 @@ export default function PatientForm() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
+  try {
     const response = await fetch("http://127.0.0.1:8000/api/patient/", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData)
     });
 
     const data = await response.json();
 
-    setSummary(data.summary);
-    console.log("Backend response:", data);
+    if (response.ok) {
+      setSummary(data.summary);
 
-    setLoading(false);
-  };
+      // 🔥 THIS IS THE IMPORTANT PART
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 1200); // slight delay so user sees summary
+      }
+    }
+
+  } catch (error) {
+    console.error("Submission failed:", error);
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="form-container">

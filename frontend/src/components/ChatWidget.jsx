@@ -24,16 +24,19 @@ export default function ChatWidget({ onRoute, forceOpen, resetSignal }) {
 
   // 🔥 Reset after form submission
   useEffect(() => {
-    if (resetSignal > 0) {
-      setChatHistory([
-        {
-          sender: "bot",
-          text: "Your request has been submitted successfully. How else can I assist you?",
-          options: initialOptions
-        }
-      ]);
-    }
-  }, [resetSignal]);
+  if (resetSignal > 0) {
+    console.log("Reset signal changed:", resetSignal);
+    setOpen(true); // ensure chat visible
+
+    setChatHistory([
+      {
+        sender: "bot",
+        text: "Your request has been submitted successfully. How else can I assist you?",
+        options: initialOptions
+      }
+    ]);
+  }
+}, [resetSignal]);
 
   const handleOptionClick = (option) => {
     if (option === "Get Medical Help") {
