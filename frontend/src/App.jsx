@@ -16,9 +16,11 @@ export default function App() {
     }
   };
 
-  const handleFormSuccess = () => {
+  // 🔥 Unified handler for BOTH submit and close
+  const handleModalClose = () => {
     setModalOpen(false);
-    setChatResetSignal(prev => prev + 1);
+    setChatOpen(true); // ensure chat is visible
+    setChatResetSignal(prev => prev + 1); // force reset every time
   };
 
   return (
@@ -35,8 +37,8 @@ export default function App() {
 
       <PatientModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSuccess={handleFormSuccess}
+        onClose={handleModalClose}   // 🔥 FIXED
+        onSuccess={handleModalClose} // 🔥 FIXED
       />
     </>
   );
