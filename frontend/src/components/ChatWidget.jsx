@@ -1,51 +1,101 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export default function ChatWidget({ onRoute, forceOpen })  {
+export default function ChatWidget({ onRoute, forceOpen, resetSignal }) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+
+  const initialOptions = [
+    "Get Medical Help",
+    "Become a Volunteer",
+    "View FAQs"
+  ];
+
   const [chatHistory, setChatHistory] = useState([
     {
       sender: "bot",
-      text: "Hello! How can I assist you today?"
+      text: "Hello! I’m the CareConnect Assistant. How can I help you today?",
+      options: initialOptions
     }
   ]);
-  
+
   useEffect(() => {
-  if (forceOpen) {
-    setOpen(true);
-  }
-}, [forceOpen]);
+    if (forceOpen) setOpen(true);
+  }, [forceOpen]);
 
-  const handleSend = async () => {
-    if (!message.trim()) return;
+  // 🔥 Reset after form submission
+  useEffect(() => {
+    if (resetSignal > 0) {
+      setChatHistory([
+        {
+          sender: "bot",
+          text: "Your request has been submitted successfully. How else can I assist you?",
+          options: initialOptions
+        }
+      ]);
+    }
+  }, [resetSignal]);
 
-    const userMessage = { sender: "user", text: message };
-    setChatHistory(prev => [...prev, userMessage]);
+  const handleOptionClick = (option) => {
+    if (option === "Get Medical Help") {
+      onRoute("/patient");
+    }
 
-    const response = await fetch("http://127.0.0.1:8000/api/chatbot/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
+    if (option === "Become a Volunteer") {
+      addBotMessage("Please register using our volunteer form.");
+    }
 
-    const data = await response.json();
+    if (option === "View FAQs") {
+      showFAQs();
+    }
 
-    const botMessage = {
-      sender: "bot",
-      text: data.response,
-      route: data.suggested_route
+    // remove previous options
+    setChatHistory(prev =>
+      prev.map(chat =>
+        chat.options ? { ...chat, options: null } : chat
+      )
+    );
+  };
+
+  const showFAQs = () => {
+    setChatHistory(prev => [
+      ...prev,
+      {
+        sender: "bot",
+        text: "Here are some common questions:",
+        options: [
+          "What services do you provide?",
+          "How do I request blood support?",
+          "What are your working hours?",
+          "How can I volunteer?"
+        ]
+      }
+    ]);
+  };
+
+  const handleFAQOption = (option) => {
+    const answers = {
+      "What services do you provide?":
+        "We provide blood coordination, medical assistance, and volunteer support.",
+      "How do I request blood support?":
+        "You can submit a request using the Medical Help option.",
+      "What are your working hours?":
+        "We operate from 9 AM to 6 PM, Monday to Saturday.",
+      "How can I volunteer?":
+        "You can register through our volunteer form."
     };
 
-    setChatHistory(prev => [...prev, botMessage]);
-    setMessage("");
+    addBotMessage(answers[option] || "Thank you for your question.");
+  };
+
+  const addBotMessage = (text) => {
+    setChatHistory(prev => [
+      ...prev,
+      { sender: "bot", text }
+    ]);
   };
 
   return (
     <>
-      {/* Floating Button */}
       <div className="chat-toggle" onClick={() => setOpen(!open)}>
         💬
       </div>
@@ -61,14 +111,20 @@ export default function ChatWidget({ onRoute, forceOpen })  {
               <div key={index} className={`chat-message ${chat.sender}`}>
                 <p>{chat.text}</p>
 
-                {chat.route && (
-                  <button
-  className="route-button"
-  onClick={() => onRoute(chat.route)}
->
-  {chat.route === "/patient" ? "Get Help" : "Proceed"}
-</button>
-                )}
+                {chat.options &&
+                  chat.options.map((option, idx) => (
+                    <button
+                      key={idx}
+                      className="route-button"
+                      onClick={() =>
+                        initialOptions.includes(option)
+                          ? handleOptionClick(option)
+                          : handleFAQOption(option)
+                      }
+                    >
+                      {option}
+                    </button>
+                  ))}
               </div>
             ))}
           </div>
@@ -80,7 +136,6 @@ export default function ChatWidget({ onRoute, forceOpen })  {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <button onClick={handleSend}>Send</button>
           </div>
         </div>
       )}

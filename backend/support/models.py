@@ -52,3 +52,11 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return self.name
+    
+class GeneralQuery(models.Model):
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Query at {self.created_at}"
+

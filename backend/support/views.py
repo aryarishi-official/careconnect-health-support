@@ -4,7 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .services.chatbot_engine import ChatbotEngine
 
-from .models import PatientRequest, Volunteer, ContactMessage
+
+from .models import PatientRequest, Volunteer, ContactMessage,GeneralQuery
 from .serializers import (
     PatientRequestSerializer,
     VolunteerSerializer,
@@ -74,5 +75,19 @@ def chatbot_response(request):
     result = ChatbotEngine.process_message(message)
 
     return Response(result, status=status.HTTP_200_OK)
+@api_view(['POST'])
+def create_general_query(request):
+    message = request.data.get("message")
+
+    if not message:
+        return Response({"error": "Message required"}, status=400)
+
+    GeneralQuery.objects.create(message=message)
+
+    return Response(
+        {"message": "Query received successfully."},
+        status=201
+    )
+
 
 # Create your views here.

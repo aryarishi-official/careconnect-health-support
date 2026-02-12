@@ -6,6 +6,8 @@ urlpatterns = [
     path('volunteer/', views.create_volunteer),
     path('contact/', views.create_contact),
     path('chatbot/', views.chatbot_response),
+    path('query/', views.create_general_query),
+
 
     
     

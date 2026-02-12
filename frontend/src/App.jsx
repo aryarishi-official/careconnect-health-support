@@ -8,11 +8,17 @@ import PatientModal from "./components/PatientModal";
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [chatResetSignal, setChatResetSignal] = useState(0);
 
   const handleRoute = (route) => {
     if (route === "/patient") {
       setModalOpen(true);
     }
+  };
+
+  const handleFormSuccess = () => {
+    setModalOpen(false);
+    setChatResetSignal(prev => prev + 1);
   };
 
   return (
@@ -21,8 +27,17 @@ export default function App() {
       <HeroSection onActivateChat={() => setChatOpen(true)} />
       <TabsSection />
 
-      <ChatWidget onRoute={handleRoute} forceOpen={chatOpen} />
-      <PatientModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <ChatWidget
+        onRoute={handleRoute}
+        forceOpen={chatOpen}
+        resetSignal={chatResetSignal}
+      />
+
+      <PatientModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={handleFormSuccess}
+      />
     </>
   );
 }
