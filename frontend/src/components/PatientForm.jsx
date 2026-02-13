@@ -22,35 +22,39 @@ export default function PatientForm({ onSuccess })  {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const response = await fetch("http://127.0.0.1:8000/api/patient/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData)
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/patient/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      setSummary(data.summary);
+      if (response.ok) {
+        setSummary(data.summary);
 
-      // 🔥 THIS IS THE IMPORTANT PART
-      if (onSuccess) {
-        setTimeout(() => {
-          onSuccess();
-        }, 1200); // slight delay so user sees summary
+        // 🔥 Pass real summary + id to parent
+        if (onSuccess) {
+          setTimeout(() => {
+            onSuccess({
+              id: data.id,
+              type: "medical",
+              summary: data.summary
+            });
+          }, 1200);
+        }
       }
+
+    } catch (error) {
+      console.error("Submission failed:", error);
     }
 
-  } catch (error) {
-    console.error("Submission failed:", error);
-  }
-
-  setLoading(false);
-};
+    setLoading(false);
+  };
 
   return (
     <div className="form-container">
@@ -81,7 +85,6 @@ export default function PatientForm({ onSuccess })  {
         <button type="submit">
           {loading ? "Submitting..." : "Submit Request"}
         </button>
-        
       </form>
 
       {summary && (

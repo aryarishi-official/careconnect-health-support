@@ -262,7 +262,7 @@ button {
 }
 
 .route-button {
-  margin-top: 6px;
+  margin: 6px;
   background: #16a34a;
   color: white;
   border: none;

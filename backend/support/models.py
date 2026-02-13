@@ -60,3 +60,13 @@ class GeneralQuery(models.Model):
     def __str__(self):
         return f"Query at {self.created_at}"
 
+class Volunteer(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    skills = models.TextField()
+    availability = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
