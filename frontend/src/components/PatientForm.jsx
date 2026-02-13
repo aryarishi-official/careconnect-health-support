@@ -26,7 +26,7 @@ export default function PatientForm({ onSuccess })  {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/patient/", {
+      const response = await fetch("https://careconnect-health-support.onrender.com/api/patient/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
